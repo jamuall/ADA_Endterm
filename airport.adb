@@ -60,7 +60,7 @@ procedure Airport is
          or
             delay 30.0;
             exit;
-                  end select;
+         end select;
       end loop;
    end Fuel;
    
@@ -163,11 +163,7 @@ procedure Airport is
          Print.Puts("Unexpected Issue => Flight number: " & FlightNum'Image & " encountered an unspecified problem.");
    end Flight;
    
-   --Flights : array(1..10) of Flight;
-   
-   type PFlight is access Flight;
-   type Flights is array(1..10) of PFlight;
-   
+   Flights : array(1..10) of Flight;
    
 begin
    Val := AircraftR.GetRandom;
