@@ -164,6 +164,10 @@ procedure Airport is
    end Flight;
    
    Flights : array(1..10) of Flight;
+
+   --type PFlight is access Flight;
+   --type Flights is array(1..10) of PFlight;
+   --My_Flights: Flights;
    
 begin
    Val := AircraftR.GetRandom;
