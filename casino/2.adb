@@ -1,92 +1,86 @@
--- Ada Programming mid-term, 2023. MAY 24. COPY THIS TEXT TO EVERY MARK
-
--- This solution was submitted and prepared by
-
--- <Min Myat Zaw Moe, F2NSO1> for the mid-term of the Ada Programming course.
-
---  I declare that this solution is my own work.
-
---  I have not copied or used third-party solutions.
-
---  I have not passed my solution to my classmates, neither made it public.
-
-with Ada.Text_IO,Ada.Numerics.Float_Random;
-use Ada.Text_IO,Ada.Numerics.Float_Random;
+with ADA.Text_IO, Ada.Numerics.Float_Random;
+use ADA.Text_IO, Ada.Numerics.Float_Random;
 
 
--- Time
--- Time_span
-
-procedure test is
-
-   protected MyG is
-      procedure Init;
-      function Give return Duration;
-   private
-      G : Generator;
-   end MyG;
-
-   protected body MyG is 
-      procedure Init is
-      begin
-         Reset(G);
-      end;
-
-      function Give return Duration is
-      begin
-         return Duration( Random(G) );
-      end Give;
-   end MyG;
-   
-
+procedure Main is
+    --Protected Printer
    protected Printer is
-      procedure Print(S : String := "");
+      procedure Print(S: String := "");
    end Printer;
-
+   
    protected body Printer is
-      procedure Print(S : String := "") is
+      procedure Print(S: String := "") is
       begin
          Put_Line(S);
       end Print;
-
    end Printer;
    
+   --Protected Safe_Random   
+   
+   protected Safe_Random is
+      procedure Init;
+      function Generate return Duration;
+   private
+      G: Generator;
+   end Safe_Random;
+   
+   protected body Safe_Random is
+      procedure Init is
+      begin
+         Reset(G);
+      end Init;
+      
+      function Generate return Duration is
+      begin
+         return Duration(Random(G));
+      end Generate;
+   end Safe_Random;
+   
+   -- player and casino task
    task Casino is
       entry Enter;
    end Casino;
+   
    task body Casino is
-   visited : Boolean := False;
+      Rand_Time: Duration;
+      Player_Entered : Boolean := False;
    begin
-      delay MyG.Give;
-      Printer.Print("Casion: Opened");
-      while not visited loop
+      Rand_Time := Safe_Random.Generate;
+      delay Rand_Time;      
+      Printer.Print("Casino: Opened");
+      
+      while not Player_Entered loop
          select
             accept Enter do
                Printer.Print("Casino: a player got in");
-               visited := True;
-            end Enter;
-         or
-              terminate;
-         end select;
-      end loop;
-      Printer.Print("Casino: finished");
-   end Casino; 
-
+               Player_Entered := True;
+               end Enter;
+            or
+               terminate;
+            end select;            
+         end loop;
+         Printer.Print("Casino: finished");
+   end Casino;
+   
+   
    task Player;
+   
    task body Player is
-      trial : Natural := 0;
-      played : Boolean := False;
+      Rand_time: Duration;
+      Retry_Count: Natural := 0;
+      Played : Boolean := False;
    begin
-      delay MyG.Give;
-      Printer.Print("Player arrives");
-      while not played and trial < 3 loop 
+      Rand_time:= Safe_Random.Generate;
+      delay Rand_time;
+      Printer.Print("player: arrived");
+      while not Played and Retry_Count < 3 loop
          select
             Casino.Enter;
-            played := True;
+            Played := True;
             Printer.Print("Player: got in");
          else
-            trial := trial + 1;
-            Printer.Print("player: try again");
+            Retry_Count := Retry_Count + 1;
+            Printer.Print("Player: try again");
          end select;
       end loop;
       if not played then
@@ -95,11 +89,9 @@ procedure test is
          Printer.Print("player: finished");
       end if;
    end Player;
-
-
-   
-   
+                    
+                 
 begin
-   MyG.Init;
-   Printer.Print("Game started");
-end test;
+    Safe_Random.Init;
+    Put_Line("Game started");
+end Main;
