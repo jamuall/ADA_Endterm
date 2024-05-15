@@ -1,86 +1,80 @@
-with ADA.Text_IO, Ada.Numerics.Float_Random;
-use ADA.Text_IO, Ada.Numerics.Float_Random;
+with Ada.Text_IO,Ada.Numerics.Float_Random;
+use Ada.Text_IO,Ada.Numerics.Float_Random;
 
 
-procedure Main is
-    --Protected Printer
-   protected Printer is
-      procedure Print(S: String := "");
-   end Printer;
-   
-   protected body Printer is
-      procedure Print(S: String := "") is
-      begin
-         Put_Line(S);
-      end Print;
-   end Printer;
-   
-   --Protected Safe_Random   
-   
-   protected Safe_Random is
+-- Time
+-- Time_span
+
+procedure test is
+
+   protected MyG is
       procedure Init;
-      function Generate return Duration;
+      function Give return Duration;
    private
-      G: Generator;
-   end Safe_Random;
-   
-   protected body Safe_Random is
+      G : Generator;
+   end MyG;
+
+   protected body MyG is 
       procedure Init is
       begin
          Reset(G);
-      end Init;
-      
-      function Generate return Duration is
+      end;
+
+      function Give return Duration is
       begin
-         return Duration(Random(G));
-      end Generate;
-   end Safe_Random;
+         return Duration( Random(G) );
+      end Give;
+   end MyG;
    
-   -- player and casino task
+
+   protected Printer is
+      procedure Print(S : String := "");
+   end Printer;
+
+   protected body Printer is
+      procedure Print(S : String := "") is
+      begin
+         Put_Line(S);
+      end Print;
+
+   end Printer;
+   
    task Casino is
       entry Enter;
    end Casino;
-   
    task body Casino is
-      Rand_Time: Duration;
-      Player_Entered : Boolean := False;
+   visited : Boolean := False;
    begin
-      Rand_Time := Safe_Random.Generate;
-      delay Rand_Time;      
-      Printer.Print("Casino: Opened");
-      
-      while not Player_Entered loop
+      delay MyG.Give;
+      Printer.Print("Casion: Opened");
+      while not visited loop
          select
             accept Enter do
                Printer.Print("Casino: a player got in");
-               Player_Entered := True;
-               end Enter;
-            or
-               terminate;
-            end select;            
-         end loop;
-         Printer.Print("Casino: finished");
-   end Casino;
-   
-   
+               visited := True;
+            end Enter;
+         or
+              terminate;
+         end select;
+      end loop;
+      Printer.Print("Casino: finished");
+   end Casino; 
+
    task Player;
-   
    task body Player is
-      Rand_time: Duration;
-      Retry_Count: Natural := 0;
-      Played : Boolean := False;
+      trial : Natural := 0;
+      played : Boolean := False;
    begin
-      Rand_time:= Safe_Random.Generate;
-      delay Rand_time;
-      Printer.Print("player: arrived");
-      while not Played and Retry_Count < 3 loop
+      delay MyG.Give;
+      Printer.Print("Player arrives");
+      while not played and trial < 3 loop 
          select
             Casino.Enter;
-            Played := True;
+            played := True;
             Printer.Print("Player: got in");
          else
-            Retry_Count := Retry_Count + 1;
-            Printer.Print("Player: try again");
+            trial := trial + 1;
+            Printer.Print("player: try again");
          end select;
       end loop;
       if not played then
@@ -89,9 +83,11 @@ procedure Main is
          Printer.Print("player: finished");
       end if;
    end Player;
-                    
-                 
+
+
+   
+   
 begin
-    Safe_Random.Init;
-    Put_Line("Game started");
-end Main;
+   MyG.Init;
+   Printer.Print("Game started");
+end test;
