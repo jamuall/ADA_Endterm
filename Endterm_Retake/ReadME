@@ -1,0 +1,41 @@
+# Network Simulator
+
+## For two
+
+Create a concurrent program to simulate a network. There is a device in the network that will send messages to a router. Implement these two concepts using protected units and/or tasks.
+
+- Create a `printer' protected unit, which will be responsible for printing during the simulation.
+
+-`device` should have a discriminant containing the address of `device` (which is now an integer between 0 and 255). You will send this address to the `router` while establishing the `device` connection.
+
+The operations of the `device`: initially establishes a connection with the `router`, then sends it a message, and finally breaks the connection.
+
+-The operation of the `router` is as follows: it has 3 entry points, namely `connect`, `send` and `close`. At the `connect` entry point, a `device` sends its address (`device` discriminator), which the `router` saved as a connected device. Through the `send` entry point, the devices can send a message to the `router`, so here the `router` expects a String in addition to their address. If a device sends a message that is not connected, ignore it.
+
+`close` disconnects the device. `router` should write each event to the screen.
+
+As activities: the `device` connects to the `router`, sends a message, and then exits.
+
+ 
+
+## For three
+
+Modify the `router' so that it has a discriminant that contains the address of the `router'. Create two routers.
+
+Modify the `device` so that it has one more discriminant (this is the third one) that will tell you which `router` it belongs to. When the `device` connects, we call the connection point of the `router` to which it belongs.
+
+The `router` should operate in such a way that it accepts devices that want to connect for 5 seconds, after which you can send messages to it for 5 seconds, and finally disconnect for 5 seconds. After that, you can connect to it again for 5 seconds.
+
+In the main program, create 2*3 dynamic `devices' and simulate flawless and faulty communication.
+
+ 
+
+## For four 
+
+Modify `device' so that it has one more discriminant, which will contain who you want to send a message to. Send this new address to the `router` along with the message.In `device`, implement an entry point so that after sending the message you wanted, it waits 5 seconds to be able to receive the messages that were sent to it. Write the received message on the screen. After 5 seconds, disconnect again.After each received message, the `router` should send the message to the `device` whose name it received as a parameter (if it does not find a `device` with the same name, it will say that it is an incorrect message). For sending messages, create a `packet` task, the only task of which is to transmit the message asynchronously (which, if it fails to send within one second, it will print the error and terminate). In the main program, create 3 `devices' and simulate the communication.
+
+ 
+
+## For five 
+
+Create a `switch'. This will serve to connect the two routers. Convert `switch` and `router` to the functionality below. When the `router` starts, it connects to the `switch`. The `switch' stores the corresponding `routers'. When a `router` received a message but could not forward it to any of the corresponding `devices`, it forwards it to the `switch`. The `switch` goes through the corresponding `routers` and tries to broadcast it one by one to everyone (`broadcast`), if every `router` sends the message back to the `switch`, the `switch` processes that the message as incorrect, since none of the `routers` could send it to any `device`.In the main program, create 2*3 `devices' and simulate flawless and faulty communication.Have fun with programming!
